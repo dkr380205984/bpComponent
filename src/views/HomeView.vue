@@ -1,5 +1,27 @@
 <template>
   <div class="home">
+    <!-- <el-button @click="talk.start('18202106177', '4')">点击开始兑奖</el-button>
+    <el-button @click="talk.destroy()">销毁对讲</el-button> -->
+    <div class="header">
+      <div class="line">组件库规范：</div>
+      <div class="line">使用组件时不要修改组件名和文件名，方便以后在项目里查找</div>
+      <div class="line">小修小改可以在具体项目里改，不要在公共库里随意改组件</div>
+      <div class="line">自己写组件时请在文件开头署上姓名，以后要给组件添加公共方法就找本人</div>
+      <div class="line">所有的组件class必须带组件缩写加横杠，举例electronicFence组件，除了最高级父容器class命名为electronicFence，子样式均为'ele-'加样式名称</div>
+      <div class="line">所有组件入参，回调函数必须写文档放在首页</div>
+    </div>
+    <div class="header">
+      <div class="line">公共CSS规范：</div>
+      <div class="line">
+        蓝色：#409EFF；浅蓝色：#e8f4ff；
+        红色：#F56C6C；浅红色：#ffeded；
+        橘黄色：#E6A23C；浅橘黄色：#fff8e6；
+        绿色：#71e2a3；浅绿色：#e7faf0；
+        紫色：#71e2a3；浅紫色：#71e2a3；
+      </div>
+      <div class="line">标题颜色：#515a6e； 正文颜色：#495060； 次要文字：#515a6e；提示文字：#515a6e； </div>
+      <div class="line">一级边框：#DCDFE6；二级边框：#E4E7ED；三级边框：#EBEEF5；四级边框：#F2F6FC； </div>
+    </div>
     <div class="container">
       <div class="title">地图绘制区域功能（电子围栏）</div>
       <div class="desc">
@@ -48,15 +70,62 @@
           @completeArea="getPath"></electronic-fence>
       </div>
     </div>
+    <div class="container">
+      <div class="title">语音对讲功能</div>
+      <div class="desc">
+        <div class="line">1.开启对讲，连接麦克风，连接设备（连接失败时会返回响应提示）</div>
+        <div class="line">2.结束(关闭)对讲，销毁连接</div>
+        <div class="line">3.页面关闭/父组件销毁时自动销毁连接</div>
+      </div>
+      <div class="title">入参说明</div>
+      <div class="table">
+        <el-table :data="talkParams" style="width: 100%">
+          <el-table-column prop="key" label="key值" width="180">
+          </el-table-column>
+          <el-table-column prop="type" label="参数类型" width="180">
+          </el-table-column>
+          <el-table-column prop="required" label="是否必填" width="180">
+          </el-table-column>
+          <el-table-column prop="default" label="默认值" width="180">
+          </el-table-column>
+          <el-table-column prop="desc" label="说明">
+          </el-table-column>
+        </el-table>
+      </div>
+      <div class="title">回调函数</div>
+      <div class="table">
+        <el-table :data="talkFn" style="width: 100%">
+          <el-table-column prop="fn" label="函数名称" width="180">
+          </el-table-column>
+          <el-table-column prop="time" label="触发时机" width="180">
+          </el-table-column>
+          <el-table-column prop="returnData" label="返回对象">
+            <template slot-scope="scope">
+              <div v-for="item, index in scope.row.returnData" :key="index">
+                <span style="color:#0079FE">{{ item.key }}</span>:{{ item.desc }}
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column prop="desc" label="说明">
+          </el-table-column>
+        </el-table>
+      </div>
+      <div class="title">组件展示</div>
+      <div class="componentFather">
+        <talk :sim-id="simId"></talk>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import electronicFence from '@/components/electronicFence.vue'
+import talk from '@/components/talk.vue'
 export default {
   name: 'HomeView',
   components: {
-    electronicFence
+    electronicFence,
+    talk
   },
   data() {
     return {
@@ -156,7 +225,99 @@ export default {
         }],
         time: '点击完成绘制按钮后触发',
         desc: '无'
-      }]
+      }],
+      talkParams: [{
+        key: 'simId',
+        type: 'String',
+        required: '必填',
+        default: '无',
+        desc: '设备卡号，测试可以用公司设备：18202106177,注意组件是监听simId变化来进行初始化的'
+      }, {
+        key: 'simChn',
+        type: 'Number',
+        required: '非必填',
+        default: '4',
+        desc: '设备端口号，测试设备用的端口号是4'
+      }, {
+        key: 'videoIp',
+        type: 'String',
+        required: '非必填',
+        default: '103.39.220.91',
+        desc: '写死，有需要传入'
+      }, {
+        key: 'videoPort',
+        type: 'String',
+        required: '非必填',
+        default: '9988',
+        desc: '写死，有需要传入'
+      }, {
+        key: 'user',
+        type: 'String',
+        required: '非必填',
+        default: 'BPHJ',
+        desc: '写死，有需要传入'
+      }, {
+        key: '其他说明',
+        type: '',
+        required: '',
+        default: '',
+        desc: '使用该组件请复制粘贴talk.js文件在子组件中手动引入'
+      }],
+      talkFn: [{
+        fn: 'afterInitSuccess',
+        returnData: [],
+        time: '初始化成功后触发',
+        desc: '无'
+      }, {
+        fn: 'afterInitFail',
+        returnData: [],
+        time: '初始化失败后触发',
+        desc: '无'
+      }, {
+        fn: 'afterMicSuccess',
+        returnData: [],
+        time: '麦克风连接成功后触发',
+        desc: '无'
+      }, {
+        fn: 'afterMicFail',
+        returnData: [{
+          key: 'tmn',
+          desc: '终端标识'
+        }, {
+          key: 'chn',
+          desc: '通道号'
+        }, {
+          key: 'reason',
+          desc: '原因'
+        }],
+        time: '麦克风连接失败后触发',
+        desc: '建议在https环境上访问，或下载安装三一平台的麦克风采集工具http://三一平台IP:端口/gps-web/rs/soft/microphone_installer.exe'
+      }, {
+        fn: 'afterTalkSuccess',
+        returnData: [],
+        time: '对讲设备连接成功后触发',
+        desc: '无'
+      }, {
+        fn: 'afterTalkFail',
+        returnData: [{
+          key: 'tmn',
+          desc: '终端标识'
+        }, {
+          key: 'chn',
+          desc: '通道号'
+        }, {
+          key: 'reason',
+          desc: '原因'
+        }],
+        time: '对讲设备连接失败后触发',
+        desc: '无'
+      }, {
+        fn: 'beforeTalkStart',
+        returnData: [],
+        time: '点击开启对讲后触发',
+        desc: '因为开启对讲连接比较慢，用户等待时间比较长，所以这里可以做一个用户体验的优化'
+      }],
+      simId: ''
     }
   },
   methods: {
@@ -165,7 +326,7 @@ export default {
     }
   },
   mounted() {
-
+    this.simId = '18202106177'
   }
 }
 </script>
@@ -173,9 +334,23 @@ export default {
 .home {
   padding: 20px;
 
+  .header {
+    padding: 20px;
+    border: 1px solid #ccc;
+    margin: 20px 0;
+    font-size: 18px;
+    background: #F5F5F5;
+    font-weight: bold;
+
+    .line {
+      margin: 12px 0;
+    }
+  }
+
   .container {
     padding: 20px;
     border: 1px solid #ccc;
+    margin: 20px 0;
 
     .title {
       font-size: 18px;

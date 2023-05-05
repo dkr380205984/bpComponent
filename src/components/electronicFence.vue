@@ -12,7 +12,7 @@
       <div class="ele-opr orange" @click="resetArea">撤销所有操作</div>
       <div class="ele-opr green" @click="completeArea">完成绘制</div>
       <el-popover placement="right" width="300" trigger="click" v-if="ifNeedHelp">
-        <div class="ele-opr" slot="reference">帮助文档</div>
+        <div class="ele-opr" slot="reference">使用帮助</div>
         <div class="ele-help">
           <div v-if="!(this.path.length === 1 && !this.ifMultify)" style="padding-left: 7em;position: relative;">
             <span style="position: absolute;left:0;color:#0079FE">添加新区域：</span>
@@ -353,22 +353,22 @@ export default {
       cursor: pointer;
 
       &.blue {
-        background: #0079FE;
+        background: #409EFF;
         color: #fff;
       }
 
       &.green {
-        background: green;
+        background: #67C23A;
         color: #fff;
       }
 
       &.red {
-        background: #D9001B;
+        background: #F56C6C;
         color: #fff;
       }
 
       &.orange {
-        background: #FF6A00;
+        background: #E6A23C;
         color: #fff;
       }
     }
